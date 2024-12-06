@@ -84,8 +84,9 @@ public class Game {
 
         Room currentRoom = startRoom;
         int attempts = 0; // Track incorrect attempts for hints and skip logic
+        int firstTryIncorrectCount = 0; // Track first-try incorrect answers
 
-        while (!roomQueue.isEmpty() || currentRoom != null) {
+        while ((!roomQueue.isEmpty() || currentRoom != null) && firstTryIncorrectCount < 3) {
             // Present the riddle if unsolved
             if (!currentRoom.solved) {
                 System.out.println("\nYou have entered " + currentRoom.name);
@@ -119,12 +120,17 @@ public class Game {
                     System.out.println("Incorrect! Try again.");
                     attempts++;
 
+                    // Increment first-try incorrect counter if this is the first attempt
+                    if (attempts == 1) {
+                        firstTryIncorrectCount++;
+                    }
+
                     // Offer hint after 3 incorrect attempts
                     if (attempts == 3) {
                         System.out.println("Hint: " + currentRoom.hint);
                     }
 
-                    // Skip logic only after 2 incorrect attempts
+                    // Ask if they want to skip only after 2 incorrect attempts
                     if (attempts >= 2) {
                         System.out.print("Do you want to skip this room? (yes/no): ");
                         String skipChoice = scanner.nextLine().trim().toLowerCase();
@@ -141,25 +147,8 @@ public class Game {
                             attempts = 0; // Reset attempts for the next room
                             continue;
                         } else {
-                            // Check if they want to go to the previous room, only if there's a previous room
-                            if (!undoMove.isEmpty()) {
-                                System.out.print("Do you want to move to the previous room? (yes/no): ");
-                                String moveBackChoice = scanner.nextLine().trim().toLowerCase();
-
-                                if (moveBackChoice.equals("yes")) {
-                                    Room lastRoom = undoMove.pop(); // Move back to the previous room
-                                    if (lastRoom != null) {
-                                        currentRoom = lastRoom;
-                                        System.out.println("You returned to " + currentRoom.name + ".");
-                                        continue;
-                                    }
-                                } else {
-                                    System.out.println("You stay in " + currentRoom.name + ".");
-                                    continue; // Stay in the current room
-                                }
-                            } else if (currentRoom == startRoom) {
-                                System.out.println("You are in the first room, so you cannot move to a previous room.");
-                            }
+                            System.out.println("You stay in " + currentRoom.name + ".");
+                            continue; // Stay in the current room
                         }
                     }
                 }
@@ -169,21 +158,30 @@ public class Game {
 
             // Check win condition
             if (solvedCount == 5) {
-                System.out.println("\nCongrats ! You have successfully repaired the car and can start adventuring the rest of this post apocalyptic world. ");
+                System.out.println("\n🎉 Congrats! You have successfully repaired the car and can start adventuring the rest of this post-apocalyptic world! 🎉");
                 break;
             }
 
-            // Move to the next room
-            if (!roomQueue.isEmpty()) {
+            // Move to the next room only if it's solved
+            if (!roomQueue.isEmpty() && currentRoom.solved) {
                 undoMove.push(currentRoom); // Push current room onto the stack
                 currentRoom = roomQueue.poll(); // Move to the next room
+            } else if (!currentRoom.solved) {
+                continue; // Stay in the current room if unsolved
             } else {
                 System.out.println("No more rooms to visit.");
                 break;
             }
         }
 
-        System.out.println("Game Over. Thanks for playing!");
+        // Lose condition
+        if (firstTryIncorrectCount >= 3) {
+            System.out.println("\n💀 You have been spotted by nearby scavengers and taken prisoner. 💀");
+        } else {
+            System.out.println("Game Over. Thanks for playing!");
+        }
+
         scanner.close();
     }
+
 }
