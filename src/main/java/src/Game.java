@@ -21,11 +21,45 @@ public class Game {
 
     // Initialize and link rooms
     private void initializeRooms() {
-        Room room1 = new Room("Room 1", "What has to be broken before you can use it?", "egg");
-        Room room2 = new Room("Room 2", "I’m tall when I’m young, and short when I’m old. What am I?", "candle");
-        Room room3 = new Room("Room 3", "The more you take, the more you leave behind. What am I?", "footsteps");
-        Room room4 = new Room("Room 4", "What has hands but cannot clap?", "clock");
-        Room room5 = new Room("Room 5", "I speak without a mouth and hear without ears. What am I?", "echo");
+        Room room1 = new Room(
+                "Room 1",
+                "What has to be broken before you can use it?",
+                new String[]{"Egg", "Window", "Code", "Chain"},
+                "egg",
+                "It’s something fragile that contains something valuable."
+        );
+
+        Room room2 = new Room(
+                "Room 2",
+                "I’m tall when I’m young, and short when I’m old. What am I?",
+                new String[]{"Candle", "Tree", "Person", "Pencil"},
+                "candle",
+                "It gives light but melts over time."
+        );
+
+        Room room3 = new Room(
+                "Room 3",
+                "The more you take, the more you leave behind. What am I?",
+                new String[]{"Footsteps", "Time", "Sand", "Memories"},
+                "footsteps",
+                "Think about something physical that gets left behind as you move."
+        );
+
+        Room room4 = new Room(
+                "Room 4",
+                "What has hands but cannot clap?",
+                new String[]{"Clock", "Doll", "Robot", "Statue"},
+                "clock",
+                "It’s something that tells time."
+        );
+
+        Room room5 = new Room(
+                "Room 5",
+                "I speak without a mouth and hear without ears. What am I?",
+                new String[]{"Echo", "Shadow", "Dream", "Light"},
+                "echo",
+                "It’s a phenomenon you experience in a canyon or large space."
+        );
 
         // Link rooms
         room1.nextRoom = room2;
@@ -41,6 +75,7 @@ public class Game {
             currentRoom = currentRoom.nextRoom;
         }
     }
+
 
     // Start the game
     public void start() {
