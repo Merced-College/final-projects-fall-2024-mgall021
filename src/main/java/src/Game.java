@@ -32,7 +32,7 @@ public class Game {
         Room room2 = new Room(
                 "Room 2",
                 "I’m tall when I’m young, and short when I’m old. What am I?",
-                new String[]{"Candle", "Tree", "Person", "Pencil"},
+                new String[]{"Tree", "Candle", "Person", "Pencil"},
                 "candle",
                 "It gives light but melts over time."
         );
@@ -40,7 +40,7 @@ public class Game {
         Room room3 = new Room(
                 "Room 3",
                 "The more you take, the more you leave behind. What am I?",
-                new String[]{"Footsteps", "Time", "Sand", "Memories"},
+                new String[]{"Sand", "Time", "Footsteps", "Memories"},
                 "footsteps",
                 "Think about something physical that gets left behind as you move."
         );
@@ -48,7 +48,7 @@ public class Game {
         Room room4 = new Room(
                 "Room 4",
                 "What has hands but cannot clap?",
-                new String[]{"Clock", "Doll", "Robot", "Statue"},
+                new String[]{"Statue", "Doll", "Robot", "Clock"},
                 "clock",
                 "It’s something that tells time."
         );
@@ -83,55 +83,83 @@ public class Game {
         System.out.println("Solve all 5 riddles to repair the car and escape!");
 
         Room currentRoom = startRoom;
+        int attempts = 0; // Track incorrect attempts for hints and skip logic
 
-        while (!roomQueue.isEmpty()) {
+        while (!roomQueue.isEmpty() || currentRoom != null) {
             // Present the riddle if unsolved
             if (!currentRoom.solved) {
                 System.out.println("\nYou have entered " + currentRoom.name);
                 System.out.println("Riddle: " + currentRoom.riddle);
-                System.out.print("Your answer: ");
-                String playerAnswer = scanner.nextLine().trim().toLowerCase();
 
-                // Check the answer
-                if (playerAnswer.equals(currentRoom.answer.toLowerCase())) {
+                // Display multiple-choice options
+                currentRoom.displayOptions();
+
+                System.out.print("Choose the correct answer (1-4): ");
+                String playerChoice = scanner.nextLine().trim();
+
+                // Validate input
+                int choiceIndex;
+                try {
+                    choiceIndex = Integer.parseInt(playerChoice) - 1;
+                    if (choiceIndex < 0 || choiceIndex >= currentRoom.options.length) {
+                        throw new NumberFormatException();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid choice. Please select a number between 1 and 4.");
+                    continue;
+                }
+
+                // Check if the answer is correct
+                if (currentRoom.options[choiceIndex].equalsIgnoreCase(currentRoom.answer)) {
                     System.out.println("Correct! This part of the car is repaired.");
                     currentRoom.solved = true;
                     solvedCount++;
+                    attempts = 0; // Reset attempts
                 } else {
-                    System.out.println("Incorrect! Try again later.");
+                    System.out.println("Incorrect! Try again.");
+                    attempts++;
 
-                    // Ask if they want to skip the room
-                    System.out.print("Do you want to skip this room? (yes/no): ");
-                    String skipChoice = scanner.nextLine().trim().toLowerCase();
+                    // Offer hint after 3 incorrect attempts
+                    if (attempts == 3) {
+                        System.out.println("Hint: " + currentRoom.hint);
+                    }
 
-                    if (skipChoice.equals("yes")) {
-                        // Move to the next room in the queue
-                        undoMove.push(currentRoom); // Push current room onto the stack
-                        if (!roomQueue.isEmpty()) {
-                            currentRoom = roomQueue.poll(); // Get the next room
-                        } else {
-                            System.out.println("No more rooms to visit.");
-                            break;
-                        }
-                        continue;
-                    } else {
-                        // Check if they want to go to the previous room, only if there's a previous room
-                        if (!undoMove.isEmpty()) {
-                            System.out.print("Do you want to move to the previous room? (yes/no): ");
-                            String moveBackChoice = scanner.nextLine().trim().toLowerCase();
+                    // Skip logic only after 2 incorrect attempts
+                    if (attempts >= 2) {
+                        System.out.print("Do you want to skip this room? (yes/no): ");
+                        String skipChoice = scanner.nextLine().trim().toLowerCase();
 
-                            if (moveBackChoice.equals("yes")) {
-                                Room lastRoom = undoMove.pop(); // Move back to the previous room
-                                if (lastRoom != null) {
-                                    currentRoom = lastRoom;
-                                    System.out.println("You returned to " + currentRoom.name + ".");
-                                    continue;
-                                }
+                        if (skipChoice.equals("yes")) {
+                            // Add the room back to the queue for later
+                            roomQueue.add(currentRoom);
+                            if (!roomQueue.isEmpty()) {
+                                currentRoom = roomQueue.poll(); // Move to the next room
                             } else {
-                                System.out.println("You stay in " + currentRoom.name + ".");
+                                System.out.println("No more rooms to visit.");
+                                break;
                             }
+                            attempts = 0; // Reset attempts for the next room
+                            continue;
                         } else {
-                            System.out.println("You are in the first room, so you cannot move to a previous room.");
+                            // Check if they want to go to the previous room, only if there's a previous room
+                            if (!undoMove.isEmpty()) {
+                                System.out.print("Do you want to move to the previous room? (yes/no): ");
+                                String moveBackChoice = scanner.nextLine().trim().toLowerCase();
+
+                                if (moveBackChoice.equals("yes")) {
+                                    Room lastRoom = undoMove.pop(); // Move back to the previous room
+                                    if (lastRoom != null) {
+                                        currentRoom = lastRoom;
+                                        System.out.println("You returned to " + currentRoom.name + ".");
+                                        continue;
+                                    }
+                                } else {
+                                    System.out.println("You stay in " + currentRoom.name + ".");
+                                    continue; // Stay in the current room
+                                }
+                            } else if (currentRoom == startRoom) {
+                                System.out.println("You are in the first room, so you cannot move to a previous room.");
+                            }
                         }
                     }
                 }
@@ -141,7 +169,7 @@ public class Game {
 
             // Check win condition
             if (solvedCount == 5) {
-                System.out.println("\nCongratulations! You've solved all the riddles and repaired the car!");
+                System.out.println("\nCongrats ! You have successfully repaired the car and can start adventuring the rest of this post apocalyptic world. ");
                 break;
             }
 
