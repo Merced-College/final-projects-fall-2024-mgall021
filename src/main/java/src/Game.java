@@ -6,13 +6,12 @@ import java.util.Scanner;
 public class Game {
     private Room startRoom;       // The first room in the linked list
     private UndoMove undoMove;    // Stack to manage player movement
-    private Queue<Room> roomQueue; // Queue to manage room traversal
+    private Queue<Room> roomQueue; // Queue to manage room
     private int solvedCount;      // Number of riddles solved
-    private Scanner scanner;      // Scanner for user input
+    private Scanner scanner;
 
-    // Constructor
     public Game() {
-        this.undoMove = new UndoMove(); // Initialize UndoMove
+        this.undoMove = new UndoMove();
         this.roomQueue = new LinkedList<>();
         this.solvedCount = 0;
         this.scanner = new Scanner(System.in);
@@ -77,7 +76,6 @@ public class Game {
     }
 
 
-    // Start the game
     public void start() {
         System.out.println("Welcome to the Post-Apocalyptic Scavenger!");
         System.out.println("Solve all 5 riddles to repair the car and escape!");
