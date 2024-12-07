@@ -27,4 +27,4 @@ A terminal-based adventure game where players navigate a post-apocalyptic world 
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone <git@github.com:Merced-College/final-projects-fall-2024-mgall021.git>
